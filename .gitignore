@@ -1,0 +1,29 @@
+# Build outputs
+build/
+target/
+dist/
+out/
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+
+# Gradle
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Env / secrets
+.env
+*.local.yml
+
+# OS
+.DS_Store
+
+#docs
+docs/
