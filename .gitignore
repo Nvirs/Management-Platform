@@ -7,6 +7,8 @@ node_modules/
 __pycache__/
 *.pyc
 .venv/
+bin/
+resources/
 
 # Gradle
 .gradle/
@@ -27,3 +29,7 @@ __pycache__/
 
 #docs
 docs/
+
+#tests
+tests/
+test/
