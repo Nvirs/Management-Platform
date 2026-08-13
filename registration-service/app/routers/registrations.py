@@ -1,8 +1,11 @@
+import logging
+
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.event_client import EventClient, get_event_client
+from app.event_publisher import EventPublisher, get_event_publisher
 from app.exceptions import (
     AlreadyCancelledException,
     AlreadyRegisteredException,
@@ -17,6 +20,7 @@ from app.schemas import RegistrationRequest, RegistrationResponse
 from app.security import get_current_user_email
 
 router = APIRouter(tags=["registrations"])
+logger = logging.getLogger(__name__)
 
 
 @router.post(
@@ -29,6 +33,7 @@ def create_registration(
     user_email: str = Depends(get_current_user_email),
     db: Session = Depends(get_db),
     event_client: EventClient = Depends(get_event_client),
+    event_publisher: EventPublisher = Depends(get_event_publisher),
 ):
     event = event_client.get_event(request.event_id)
     if event is None:
@@ -64,6 +69,16 @@ def create_registration(
     db.add(registration)
     db.commit()
     db.refresh(registration)
+
+    try:
+        event_publisher.publish_registration_confirmed(registration)
+    except Exception:
+        logger.warning(
+            "Failed to publish registration.confirmed event for registration %s",
+            registration.id,
+            exc_info=True,
+        )
+
     return registration
 
 

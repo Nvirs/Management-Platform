@@ -32,6 +32,41 @@ def test_create_registration_success(client, events, auth_header):
     assert body["status"] == "REGISTERED"
 
 
+def test_create_registration_publishes_confirmation_event(
+    client, events, auth_header, publisher
+):
+    events.add_event("event-1", organizer_email="organizer@example.com")
+
+    response = client.post(
+        "/api/registrations",
+        json={"event_id": "event-1"},
+        headers=auth_header("attendee@example.com"),
+    )
+
+    registration_id = response.json()["id"]
+    assert len(publisher.published) == 1
+    routing_key, payload = publisher.published[0]
+    assert routing_key == "registration.confirmed"
+    assert payload["registrationId"] == registration_id
+    assert payload["eventId"] == "event-1"
+    assert payload["userEmail"] == "attendee@example.com"
+
+
+def test_create_registration_succeeds_even_if_publish_fails(
+    client, events, auth_header, publisher
+):
+    events.add_event("event-1", organizer_email="organizer@example.com")
+    publisher.raise_on_publish = True
+
+    response = client.post(
+        "/api/registrations",
+        json={"event_id": "event-1"},
+        headers=auth_header("attendee@example.com"),
+    )
+
+    assert response.status_code == 201
+
+
 def test_duplicate_registration_returns_409(client, events, auth_header):
     events.add_event("event-1", organizer_email="organizer@example.com")
     headers = auth_header("attendee@example.com")

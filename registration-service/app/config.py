@@ -12,9 +12,11 @@ class Settings(BaseSettings):
     db_user: str = "postgres"
     db_password: str = "postgres"
 
-    jwt_secret: str = "change-this-development-only-secret-key-must-be-long-enough"
+    jwt_secret: str = "your-secret-key"
 
     event_service_url: str = "http://localhost:8082"
+
+    rabbitmq_url: str = "amqp://guest:guest@localhost:5672"
 
     @property
     def database_url(self) -> str:
