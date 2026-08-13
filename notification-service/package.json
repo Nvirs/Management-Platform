@@ -1,0 +1,19 @@
+{
+  "name": "notification-service",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "amqplib": "^2.0.1",
+    "express": "^4.19.2"
+  }
+}
