@@ -4,10 +4,10 @@ export const EXCHANGE = 'events';
 export const QUEUE = 'notification-service.registration-confirmed';
 export const ROUTING_KEY = 'registration.confirmed';
 
-export async function connectWithRetry(url, { retries = 10, delayMs = 3000 } = {}) {
+export async function connectWithRetry(connectionOptions, { retries = 10, delayMs = 3000 } = {}) {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
-      return await amqp.connect(url);
+      return await amqp.connect(connectionOptions);
     } catch (err) {
       const isLastAttempt = attempt === retries;
       console.error(

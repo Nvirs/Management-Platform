@@ -13,12 +13,6 @@ EXCHANGE_TYPE = "topic"
 
 
 class EventPublisher:
-    """Thin AMQP publisher for domain events, backed by pika.
-
-    A connection is opened and closed per publish rather than kept alive
-    across requests, since pika's BlockingConnection isn't safe to share
-    across the threads FastAPI uses for sync endpoints.
-    """
 
     def __init__(self, url: str):
         self._url = url

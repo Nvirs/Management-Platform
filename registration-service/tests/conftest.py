@@ -47,7 +47,7 @@ class FakeEventClient:
 
 
 class FakeEventPublisher:
-    """In-memory stand-in for the RabbitMQ publisher, so tests don't need a broker."""
+    """In-memory stand-in for the RabbitMQ publisher"""
 
     def __init__(self):
         self.published: list[tuple[str, dict]] = []

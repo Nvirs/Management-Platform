@@ -9,7 +9,7 @@ app.listen(config.port, () => {
   console.log(`notification-service listening on port ${config.port}`);
 });
 
-connectWithRetry(config.rabbitmqUrl)
+connectWithRetry(config.rabbitmq)
   .then((connection) => startConsumer(connection, handleRegistrationConfirmed))
   .then(() => console.log('Consuming registration.confirmed events'))
   .catch((err) => {
