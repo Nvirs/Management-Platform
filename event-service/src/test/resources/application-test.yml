@@ -9,4 +9,5 @@ spring:
       ddl-auto: create-drop
 
 jwt:
-  secret: 1234
+  # JJWT rejects HMAC keys shorter than 256 bits, so this must stay >= 32 bytes.
+  secret: test-only-secret-key-for-event-service-unit-tests-1234

@@ -36,8 +36,9 @@ spring:
           uri: ${EVENT_SERVICE_URI:http://localhost:8082}
           predicates:
             - Path=/api/events/**
-  
-  
+
+
+jwt:
   secret: ${jwt_secret:${JWT_SECRET:dev-only-default-secret-please-override-in-any-real-env}}
 
 management:
