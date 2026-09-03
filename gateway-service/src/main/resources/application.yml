@@ -1,0 +1,47 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  application:
+    name: gateway-service
+  config:
+    import: "optional:configtree:/run/secrets/"
+  cloud:
+    gateway:
+      httpclient:
+        connect-timeout: 2000
+        response-timeout: 10s
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+      routes:
+        - id: auth-service
+          uri: ${AUTH_SERVICE_URI:http://localhost:8081}
+          predicates:
+            - Path=/api/auth/**
+
+        - id: registration-service
+          uri: ${REGISTRATION_SERVICE_URI:http://localhost:8083}
+          predicates:
+            - Path=/api/registrations/**
+        - id: registration-service-event-participants
+          uri: ${REGISTRATION_SERVICE_URI:http://localhost:8083}
+          predicates:
+            - Path=/api/events/*/registrations
+
+        - id: event-service
+          uri: ${EVENT_SERVICE_URI:http://localhost:8082}
+          predicates:
+            - Path=/api/events/**
+  
+  
+  secret: ${jwt_secret:${JWT_SECRET:dev-only-default-secret-please-override-in-any-real-env}}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,gateway
