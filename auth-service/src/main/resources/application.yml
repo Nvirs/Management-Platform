@@ -1,0 +1,23 @@
+server:
+  port: ${PORT:8081}
+
+spring:
+  config:
+    import: "optional:configtree:/run/secrets/"
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:eventplatform}
+    username: ${DB_USER:postgres}
+    password: ${db_password:${DB_PASSWORD:postgres}}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+jwt:
+  secret: ${jwt_secret:${JWT_SECRET:dev-only-default-secret-please-override-in-any-real-env}}
+  expiration-ms: ${JWT_EXPIRATION_MS:3600000}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health

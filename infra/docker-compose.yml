@@ -90,6 +90,45 @@ services:
         reservations:
           memory: 256M
 
+  auth-service:
+    build:
+      context: ../auth-service
+    container_name: eventplatform-auth
+    restart: unless-stopped
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    tmpfs:
+      - /tmp
+    environment:
+      PORT: ${AUTH_PORT:-8081}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-eventplatform}
+      DB_USER: ${DB_USER:-postgres}
+    secrets:
+      - db_password
+      - jwt_secret
+    ports:
+      - "${AUTH_PORT:-8081}:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8081/actuator/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 512M
+        reservations:
+          memory: 256M
+
   event-service:
     build:
       context: ../event-service
