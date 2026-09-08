@@ -1,0 +1,5 @@
+# every resource in this platform lives in one namespace, mirroring the single
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: eventplatform

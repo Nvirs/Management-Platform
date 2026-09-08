@@ -1,0 +1,13 @@
+# headless (clusterIP: None) because this is a StatefulSet's governing
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: eventplatform
+spec:
+  clusterIP: None
+  selector:
+    app: postgres
+  ports:
+    - port: 5432
+      targetPort: 5432

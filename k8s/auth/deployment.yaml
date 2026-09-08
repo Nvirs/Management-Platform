@@ -1,0 +1,69 @@
+# Stateless any pod can serve any request
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+  namespace: eventplatform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-service
+  template:
+    metadata:
+      labels:
+        app: auth-service
+    spec:
+      # See k8s/postgres/statefulset.yaml for why: avoids a mount collision
+      automountServiceAccountToken: false
+      containers:
+        - name: auth-service
+          image: eventplatform/auth-service:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8081
+          envFrom:
+            - configMapRef:
+                name: eventplatform-config
+          volumeMounts:
+            - name: secrets
+              mountPath: /run/secrets
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8081
+            initialDelaySeconds: 15
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8081
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          resources:
+            requests:
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+      volumes:
+        - name: secrets
+          secret:
+            secretName: eventplatform-secrets
+            items:
+              - key: db_password
+                path: db_password
+              - key: jwt_secret
+                path: jwt_secret
+        - name: tmp
+          emptyDir: {}

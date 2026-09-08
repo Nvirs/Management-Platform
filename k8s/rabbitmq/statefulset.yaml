@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rabbitmq
+  namespace: eventplatform
+spec:
+  serviceName: rabbitmq
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      # see k8s/postgres/statefulset.yaml for why: avoids a mount collision
+      automountServiceAccountToken: false
+      containers:
+        - name: rabbitmq
+          image: rabbitmq:3.13-management-alpine
+          ports:
+            - containerPort: 5672
+              name: amqp
+            - containerPort: 15672
+              name: management
+          env:
+            - name: RABBITMQ_DEFAULT_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: eventplatform-config
+                  key: RABBITMQ_USER
+          # same wrapper as infra/docker-compose.yml: the image has no native
+          command:
+            - sh
+            - -c
+            - 'export RABBITMQ_DEFAULT_PASS="$(cat /run/secrets/rabbitmq_password)"; exec docker-entrypoint.sh rabbitmq-server'
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/rabbitmq
+            - name: secrets
+              mountPath: /run/secrets
+              readOnly: true
+          securityContext:
+            capabilities:
+              drop: ["ALL"]
+              add: ["CHOWN", "DAC_OVERRIDE", "FOWNER", "SETUID", "SETGID"]
+          readinessProbe:
+            exec:
+              command: ["rabbitmq-diagnostics", "-q", "ping"]
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            exec:
+              command: ["rabbitmq-diagnostics", "-q", "ping"]
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          resources:
+            requests:
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+      volumes:
+        - name: secrets
+          secret:
+            secretName: eventplatform-secrets
+            items:
+              - key: rabbitmq_password
+                path: rabbitmq_password
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi

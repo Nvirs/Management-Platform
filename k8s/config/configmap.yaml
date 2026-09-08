@@ -1,0 +1,21 @@
+# non-secret configuration shared across the platform, equivalent to the plain
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eventplatform-config
+  namespace: eventplatform
+data:
+  DB_HOST: "postgres"
+  DB_PORT: "5432"
+  DB_NAME: "eventplatform"
+  DB_USER: "postgres"
+
+  RABBITMQ_HOST: "rabbitmq"
+  RABBITMQ_PORT: "5672"
+  RABBITMQ_USER: "guest"
+
+  EVENT_SERVICE_URL: "http://event-service:8082"
+
+  AUTH_SERVICE_URI: "http://auth-service:8081"
+  EVENT_SERVICE_URI: "http://event-service:8082"
+  REGISTRATION_SERVICE_URI: "http://registration-service:8083"

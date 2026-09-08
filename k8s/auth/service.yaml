@@ -1,0 +1,12 @@
+# regular ClusterIP: unlike postgres/rabbitmq, we want normal load-balancing
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  namespace: eventplatform
+spec:
+  selector:
+    app: auth-service
+  ports:
+    - port: 8081
+      targetPort: 8081
