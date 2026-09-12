@@ -1,0 +1,8 @@
+# Copy to terraform.tfvars (gitignored) and adjust as needed.
+
+aws_region   = "eu-central-1"
+cluster_name = "eventplatform"
+
+# Uncomment and set to your own IAM user/role ARN if someone other than the
+# `terraform apply` caller also needs kubectl access.
+# admin_principal_arns = ["arn:aws:iam::123456789012:user/yourname"]
