@@ -12,7 +12,8 @@ FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
 
-RUN addgroup -S spring && adduser -S spring -G spring
+# Pinned numeric UID/GID
+RUN addgroup -g 1000 -S spring && adduser -u 1000 -S -D -H -G spring spring
 COPY --from=build /app/build/libs/*.jar app.jar
 
 USER spring
